@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"target": "ES6",
+		"module": "commonjs",
+		"moduleResolution": "node", // Указывает метод разрешения модулей
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"strict": true,
+		"esModuleInterop": true // Позволяет использовать CommonJS модули в ES6
+	},
+	"include": ["src/**/*"],
+	"exclude": ["node_modules"]
+}
