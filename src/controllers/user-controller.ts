@@ -29,7 +29,12 @@ class UserController {
 
 	async activate(req: Request, res: Response) {
 		try {
-		} catch (err) {}
+			const activationLink = req.params.link
+			await userService.activate(activationLink)
+			return res.redirect(process.env.CLIENT_URL || 'https://ya.ru/')
+		} catch (err) {
+			console.log(err)
+		}
 	}
 
 	async refresh(req: Request, res: Response) {
