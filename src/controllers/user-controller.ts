@@ -1,8 +1,8 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import userService from '../services/user-service'
 
 class UserController {
-	async registration(req: Request, res: Response) {
+	async registration(req: Request, res: Response, next: NextFunction) {
 		try {
 			const { email, password } = req.body
 			const userData = await userService.registration(email, password)
@@ -13,39 +13,47 @@ class UserController {
 			})
 			return res.json(userData)
 		} catch (err) {
-			console.log(err)
+			next(err)
 		}
 	}
 
-	async login(req: Request, res: Response) {
+	async login(req: Request, res: Response, next: NextFunction) {
 		try {
-		} catch (err) {}
+		} catch (err) {
+			next(err)
+		}
 	}
 
-	async logout(req: Request, res: Response) {
+	async logout(req: Request, res: Response, next: NextFunction) {
 		try {
-		} catch (err) {}
+		} catch (err) {
+			next(err)
+		}
 	}
 
-	async activate(req: Request, res: Response) {
+	async activate(req: Request, res: Response, next: NextFunction) {
 		try {
 			const activationLink = req.params.link
 			await userService.activate(activationLink)
 			return res.redirect(process.env.CLIENT_URL || 'https://ya.ru/')
 		} catch (err) {
-			console.log(err)
+			next(err)
 		}
 	}
 
-	async refresh(req: Request, res: Response) {
+	async refresh(req: Request, res: Response, next: NextFunction) {
 		try {
-		} catch (err) {}
+		} catch (err) {
+			next(err)
+		}
 	}
 
-	async getUsers(req: Request, res: Response) {
+	async getUsers(req: Request, res: Response, next: NextFunction) {
 		try {
 			res.json(['123', '432'])
-		} catch (err) {}
+		} catch (err) {
+			next(err)
+		}
 	}
 }
 

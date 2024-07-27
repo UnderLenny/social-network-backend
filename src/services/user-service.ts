@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 import { UserDto } from '../dtos/user-dto'
+import { ApiError } from '../exceptions/api-error'
 import { userModel } from '../models/user-model'
 import mailService from './mail-service'
 import tokenService from './token.service'
@@ -9,7 +10,7 @@ class UserService {
 	async registration(email: string, password: string) {
 		const candidate = await userModel.findOne({ email })
 		if (candidate) {
-			throw new Error(
+			throw ApiError.BadRequest(
 				`Пользователь с таким почтовым адресом ${email} уже существует`
 			)
 		}
@@ -40,7 +41,7 @@ class UserService {
 	async activate(activationLink: string) {
 		const user = await userModel.findOne({ activationLink })
 		if (!user) {
-			throw new Error('Некорректная ссылка для активации')
+			throw ApiError.BadRequest('Некорректная ссылка для активации')
 		}
 
 		user.isActivated = true
