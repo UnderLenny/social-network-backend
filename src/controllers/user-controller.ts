@@ -39,6 +39,10 @@ class UserController {
 
 	async logout(req: Request, res: Response, next: NextFunction) {
 		try {
+			const { refreshToken } = req.cookies
+			const token = await userService.logout(refreshToken)
+			res.clearCookie('refreshToken')
+			return res.json(token)
 		} catch (err) {
 			next(err)
 		}
@@ -56,6 +60,10 @@ class UserController {
 
 	async refresh(req: Request, res: Response, next: NextFunction) {
 		try {
+			const { refreshToken } = req.cookies
+			const token = await userService.refresh(refreshToken)
+			res.clearCookie('refreshToken')
+			return res.json(token)
 		} catch (err) {
 			next(err)
 		}
@@ -63,7 +71,8 @@ class UserController {
 
 	async getUsers(req: Request, res: Response, next: NextFunction) {
 		try {
-			res.json(['123', '432'])
+			const users = await userService.getAllUsers()
+			return res.json(users)
 		} catch (err) {
 			next(err)
 		}

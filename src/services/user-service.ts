@@ -1,10 +1,15 @@
 import bcrypt from 'bcryptjs'
+import { JwtPayload } from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 import { UserDto } from '../dtos/user-dto'
 import { ApiError } from '../exceptions/api-error'
 import { userModel } from '../models/user-model'
 import mailService from './mail-service'
 import tokenService from './token.service'
+
+interface MyJwtPayload extends JwtPayload {
+	id: string
+}
 
 class UserService {
 	async registration(email: string, password: string) {
@@ -68,6 +73,42 @@ class UserService {
 			...tokens,
 			user: userDto,
 		}
+	}
+
+	async logout(refreshToken: string) {
+		const token = await tokenService.removeToken(refreshToken)
+		return token
+	}
+
+	async refresh(refreshToken: string) {
+		if (!refreshToken) {
+			throw ApiError.UnauthorizedError()
+		}
+
+		const userData = tokenService.validateRefreshToken(
+			refreshToken
+		) as MyJwtPayload
+		const tokenFromDb = await tokenService.findToken(refreshToken)
+
+		if (!userData || !tokenFromDb) {
+			throw ApiError.UnauthorizedError()
+		}
+
+		const user = await userModel.findById(userData.id)
+		const userDto = new UserDto(user!)
+		const tokens = tokenService.generateTokens({ ...userDto })
+
+		await tokenService.saveToken(userDto.id, tokens.refreshToken)
+
+		return {
+			...tokens,
+			user: userDto,
+		}
+	}
+
+	async getAllUsers() {
+		const users = await userModel.find()
+		return users
 	}
 }
 

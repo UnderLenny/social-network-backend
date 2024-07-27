@@ -2,7 +2,7 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
 import { errorMiddleware } from './middlewares/error-middleware'
-import router from './routes/index'
+import router from './routes/userRoutes'
 
 const app = express()
 
