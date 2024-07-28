@@ -1,17 +1,13 @@
-export class UserDto {
+class UserDto {
 	email: string
-	id: any
+	id: string
 	isActivated: boolean
 
-	constructor(model: IUserModel) {
+	constructor(model: { email: string; _id: any; isActivated: boolean }) {
 		this.email = model.email
-		this.id = model._id.toString()
+		this.id = model._id
 		this.isActivated = model.isActivated
 	}
 }
 
-interface IUserModel {
-	email: string
-	_id: any
-	isActivated: boolean
-}
+export default UserDto

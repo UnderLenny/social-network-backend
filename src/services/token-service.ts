@@ -10,12 +10,11 @@ export interface ITokenPayload {
 class TokenService {
 	generateTokens(payload: ITokenPayload) {
 		const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET!, {
-			expiresIn: process.env.EXPIRES_IN_ACCESS,
+			expiresIn: '30m',
 		})
 		const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, {
-			expiresIn: process.env.EXPIRES_IN_REFRESH,
+			expiresIn: '30s',
 		})
-
 		return {
 			accessToken,
 			refreshToken,
@@ -24,18 +23,26 @@ class TokenService {
 
 	validateAccessToken(token: string) {
 		try {
-			const userData = jwt.verify(token, process.env.JWT_ACCESS_SECRET!)
+			const secret = process.env.JWT_ACCESS_SECRET
+			if (!secret) {
+				throw new Error('JWT access secret is not defined')
+			}
+			const userData = jwt.verify(token, secret)
 			return userData
-		} catch (err) {
+		} catch (e) {
 			return null
 		}
 	}
 
 	validateRefreshToken(token: string) {
 		try {
-			const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET!)
+			const secret = process.env.JWT_REFRESH_SECRET
+			if (!secret) {
+				throw new Error('JWT refresh secret is not defined')
+			}
+			const userData = jwt.verify(token, secret)
 			return userData
-		} catch (err) {
+		} catch (e) {
 			return null
 		}
 	}
@@ -46,7 +53,6 @@ class TokenService {
 			tokenData.refreshToken = refreshToken
 			return tokenData.save()
 		}
-
 		const token = await tokenModel.create({ user: userId, refreshToken })
 		return token
 	}
@@ -61,5 +67,4 @@ class TokenService {
 		return tokenData
 	}
 }
-
 export default new TokenService()

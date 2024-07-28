@@ -1,11 +1,11 @@
 import bcrypt from 'bcryptjs'
 import { JwtPayload } from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
-import { UserDto } from '../dtos/user-dto'
+import UserDto from '../dtos/user-dto'
 import { ApiError } from '../exceptions/api-error'
 import { userModel } from '../models/user-model'
 import mailService from './mail-service'
-import tokenService from './token.service'
+import tokenService from './token-service'
 
 interface MyJwtPayload extends JwtPayload {
 	id: string
@@ -84,10 +84,10 @@ class UserService {
 		if (!refreshToken) {
 			throw ApiError.UnauthorizedError()
 		}
-
 		const userData = tokenService.validateRefreshToken(
 			refreshToken
 		) as MyJwtPayload
+
 		const tokenFromDb = await tokenService.findToken(refreshToken)
 
 		if (!userData || !tokenFromDb) {
@@ -95,7 +95,12 @@ class UserService {
 		}
 
 		const user = await userModel.findById(userData.id)
-		const userDto = new UserDto(user!)
+
+		if (!user) {
+			throw ApiError.UnauthorizedError()
+		}
+
+		const userDto = new UserDto(user)
 		const tokens = tokenService.generateTokens({ ...userDto })
 
 		await tokenService.saveToken(userDto.id, tokens.refreshToken)
