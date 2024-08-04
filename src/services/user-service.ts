@@ -12,7 +12,12 @@ interface MyJwtPayload extends JwtPayload {
 }
 
 class UserService {
-	async registration(email: string, password: string) {
+	async registration(
+		email: string,
+		password: string,
+		name: string,
+		surname: string
+	) {
 		const candidate = await userModel.findOne({ email })
 		if (candidate) {
 			throw ApiError.BadRequest(
@@ -25,6 +30,8 @@ class UserService {
 
 		const user = await userModel.create({
 			email,
+			name,
+			surname,
 			password: hashPassword,
 			activationLink,
 		})
